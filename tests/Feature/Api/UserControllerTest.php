@@ -294,4 +294,20 @@ class UserControllerTest extends TestCase
         $response = $this->put('/api/users/' . $oldUser->id, array_merge($data, ['password_confirmation' => 'password']));
         $response->assertStatus(200);
     }
+
+    public function testApiDeleteUserWithResultOk()
+    {
+        $oldUser = User::factory()->create();
+        $response = $this->delete('/api/users/' . $oldUser->id);
+        $response->assertStatus(200);
+        $response->assertExactJson(['result' => 'Ok']);
+        $this->assertEmpty(User::find($oldUser->id));
+    }
+
+    public function testApiDeleteUserWithNotFound()
+    {
+        $response = $this->delete('/api/users/1');
+        $response->assertStatus(404);
+        $response->assertNotFound();
+    }
 }

@@ -46,6 +46,12 @@ class UserController extends Controller
         return $user;
     }
 
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return response()->json(['result' => 'Ok']);
+    }
+
     private function validator(array $data, array $rules)
     {
         return Validator::make($data, $rules, $this->getMessages());
