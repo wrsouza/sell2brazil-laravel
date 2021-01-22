@@ -219,7 +219,9 @@ class UserControllerTest extends TestCase
         $this->assertObjectNotHasAttribute('password', $content);
 
         $updatedUser = User::find($oldUser->id);
-        $this->assertTrue(Hash::check($data['password'], $updatedUser->password));
+        $this->assertTrue(
+            Hash::check($data['password'], $updatedUser->password)
+        );
     }
 
     public function testApiPutUserWithFailedMaxCharacters()
@@ -291,7 +293,10 @@ class UserControllerTest extends TestCase
             'password' => 'password'
         ];
         $oldUser = User::factory()->create($data);
-        $response = $this->put('/api/users/' . $oldUser->id, array_merge($data, ['password_confirmation' => 'password']));
+        $response = $this->put(
+            '/api/users/' . $oldUser->id,
+            array_merge($data, ['password_confirmation' => 'password'])
+        );
         $response->assertStatus(200);
     }
 
