@@ -191,4 +191,107 @@ class UserControllerTest extends TestCase
         $response->assertStatus(404);
         $response->assertNotFound();
     }
+
+    public function testApiPutUserReturnsUpdatedUser()
+    {
+        $oldUser = User::factory()->create();
+        $data = [
+            'name' => 'User Test',
+            'email' => 'test@test.com',
+            'password' => 'password',
+            'password_confirmation' => 'password'
+        ];
+
+        $response = $this->put('/api/users/' . $oldUser->id, $data);
+        $response->assertStatus(200);
+        $response->assertJsonStructure([
+            'id',
+            'name',
+            'email',
+            'created_at',
+            'updated_at'
+        ]);
+
+        $content = json_decode($response->getContent());
+        $this->assertEquals($oldUser->id, $content->id);
+        $this->assertEquals($data['name'], $content->name);
+        $this->assertEquals($data['email'], $content->email);
+        $this->assertObjectNotHasAttribute('password', $content);
+
+        $updatedUser = User::find($oldUser->id);
+        $this->assertTrue(Hash::check($data['password'], $updatedUser->password));
+    }
+
+    public function testApiPutUserWithFailedMaxCharacters()
+    {
+        $oldUser = User::factory()->create();
+        $password = Str::random(21);
+        $data = [
+            'name' => Str::random(256),
+            'password' => $password,
+            'password_confirmation' => $password
+        ];
+        $response = $this->put('/api/users/' . $oldUser->id, $data);
+        $response->assertStatus(400);
+        $response->assertExactJson([
+            'name' => ['Máximo de 255 caracteres!'],
+            'password' => ['Máximo de 20 caracteres!']
+        ]);
+    }
+
+    public function testApiPutUserWithFailedMinCharacters()
+    {
+        $oldUser = User::factory()->create();
+        $password = Str::random(5);
+        $data = [
+            'name' => Str::random(4),
+            'password' => $password,
+            'password_confirmation' => $password
+        ];
+        $response = $this->put('/api/users/' . $oldUser->id, $data);
+        $response->assertStatus(400);
+        $response->assertExactJson([
+            'name' => ['Mínimo de 5 caracteres!'],
+            'password' => ['Mínimo de 6 caracteres!']
+        ]);
+    }
+
+    public function testApiPutUserWithFailedEmailValidation()
+    {
+        $oldUser = User::factory()->create();
+        $data = [
+            'email' => 'email_invalid'
+        ];
+        $response = $this->put('/api/users/' . $oldUser->id, $data);
+        $response->assertStatus(400);
+        $response->assertExactJson([
+            'email' => ['E-mail inválido!']
+        ]);
+    }
+
+    public function testApiPutUserWithFailedUniqueEmail()
+    {
+        User::factory()->create(['email' => 'test@test.com']);
+        $oldUser = User::factory()->create();
+        $data = [
+            'email' => 'test@test.com'
+        ];
+        $response = $this->put('/api/users/' . $oldUser->id, $data);
+        $response->assertStatus(400);
+        $response->assertExactJson([
+            'email' => [$data['email'] . ' já em uso!']
+        ]);
+    }
+
+    public function testApiPutUserWithTheSameData()
+    {
+        $data = [
+            'name' => 'User Test',
+            'email' => 'test@test.com',
+            'password' => 'password'
+        ];
+        $oldUser = User::factory()->create($data);
+        $response = $this->put('/api/users/' . $oldUser->id, array_merge($data, ['password_confirmation' => 'password']));
+        $response->assertStatus(200);
+    }
 }

@@ -33,6 +33,19 @@ class UserController extends Controller
         return $user;
     }
 
+    public function update(Request $request, User $user)
+    {
+        $data = $this->filterData($request->all());
+
+        $validator = $this->validator($data, $this->getRules($user));
+        if ($validator->fails()) {
+            return response()->json($validator->errors())->setStatusCode(400);
+        }
+
+        $user->update($data);
+        return $user;
+    }
+
     private function validator(array $data, array $rules)
     {
         return Validator::make($data, $rules, $this->getMessages());
