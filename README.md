@@ -31,6 +31,15 @@ Executar os Testes
 
 - <b>docker exec -it sell2brazil php artisan test</b>
 
+Criar as Tabelas no Banco de Dados
+
+- <b>docker exec -it sell2brazil php artisan migrate</b>
+
+Alimentar a Tabela Users com dados <b>fake</b>
+
+- <b>docker exec -it sell2brazil php artisan db:seed</b>
+
 Acessando o container <b>( PHP )</b>
 
 - <b>docker exec -it sell2brazil bash</b>
+
