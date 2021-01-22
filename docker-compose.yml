@@ -1,0 +1,35 @@
+version: "3"
+services:
+  php:
+    build: .docker
+    container_name: sell2brazil
+    image: sell2brazil
+    volumes:
+      - .:/var/www/html
+    ports:
+      - 80:80
+    links:
+      - mysql
+    restart: always
+    networks:
+      - mynetwork
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: always
+    volumes:
+      - .db/mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sell2brazil
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
