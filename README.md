@@ -43,3 +43,8 @@ Acessando o container <b>( PHP )</b>
 
 - <b>docker exec -it sell2brazil bash</b>
 
+
+### Instruções para Instalação do Frontend
+
+- Reference: https://github.com/wrsouza/sell2brazil-vue3-typescript (frontend)
+
