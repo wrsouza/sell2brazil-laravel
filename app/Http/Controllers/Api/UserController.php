@@ -28,6 +28,11 @@ class UserController extends Controller
         return User::create($data);
     }
 
+    public function show(User $user)
+    {
+        return $user;
+    }
+
     private function validator(array $data, array $rules)
     {
         return Validator::make($data, $rules, $this->getMessages());

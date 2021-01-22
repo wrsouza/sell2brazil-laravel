@@ -171,4 +171,24 @@ class UserControllerTest extends TestCase
             'email' => [$data['email'] . ' já em uso!']
         ]);
     }
+
+    public function testApiGetUserReturnsOneUser()
+    {
+        $user = User::factory()->create();
+        $response = $this->get('/api/users/' . $user->id);
+        $response->assertStatus(200);
+
+        $content = json_decode($response->getContent());
+        $this->assertEquals($user->id, $content->id);
+        $this->assertEquals($user->name, $content->name);
+        $this->assertEquals($user->email, $content->email);
+        $this->assertObjectNotHasAttribute('password', $content);
+    }
+
+    public function testApiGetUserWithNotFound()
+    {
+        $response = $this->get('/api/users/1');
+        $response->assertStatus(404);
+        $response->assertNotFound();
+    }
 }
